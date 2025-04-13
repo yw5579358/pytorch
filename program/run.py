@@ -7,11 +7,11 @@ import argparse
 from tensorboardX import SummaryWriter
 
 parser = argparse.ArgumentParser(description='Chinese Text Classification')
-parser.add_argument('--model',default='TextRNN', type=str, required=False, help='choose a model: TextCNN, TextRNN, FastText, TextRCNN, TextRNN_Att, DPCNN, Transformer')
+parser.add_argument('--model', default='TextRNN', type=str, required=False,
+                    help='choose a model: TextCNN, TextRNN, FastText, TextRCNN, TextRNN_Att, DPCNN, Transformer')
 parser.add_argument('--embedding', default='pre_trained', type=str, help='random or pre_trained')
 parser.add_argument('--word', default=False, type=bool, help='True for word, False for char')
 args = parser.parse_args()
-
 
 if __name__ == '__main__':
     dataset = 'THUCNews'  # 数据集
@@ -20,9 +20,10 @@ if __name__ == '__main__':
     embedding = 'embedding_SougouNews.npz'
     if args.embedding == 'random':
         embedding = 'random'
-    model_name = args.model  #TextCNN, TextRNN,
+    model_name = args.model  # TextCNN, TextRNN,
     if model_name == 'FastText':
         from utils_fasttext import build_dataset, build_iterator, get_time_dif
+
         embedding = 'random'
     else:
         from utils import build_dataset, build_iterator, get_time_dif
@@ -33,6 +34,7 @@ if __name__ == '__main__':
     torch.manual_seed(1)
     torch.cuda.manual_seed_all(1)
     torch.backends.cudnn.deterministic = True  # 保证每次结果一样
+    torch.use_deterministic_algorithms(True)  # 同上，更通用，上面的不适合mps （M1）
 
     start_time = time.time()
     print("Loading data...")
@@ -50,4 +52,4 @@ if __name__ == '__main__':
     if model_name != 'Transformer':
         init_network(model)
     print(model.parameters)
-    train(config, model, train_iter, dev_iter, test_iter,writer)
+    train(config, model, train_iter, dev_iter, test_iter, writer)
